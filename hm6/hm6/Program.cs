@@ -1,102 +1,56 @@
-﻿using System;
+﻿using hm6;
+using System;
 
-class Calculator
+internal class Program
 {
     static void Main(string[] args)
     {
-        while (true)
+        DoubleTryParse doubleTryParse = new DoubleTryParse();
+        bool isExit = true;
+
+        while (isExit)
         {
-            Console.Write("Введите выражение ('выход' для выхода): ");
-            string input = Console.ReadLine();
+            InterfaceCalc calc = new Calc();
+            
+            Console.WriteLine("Введите первое число: ");
+            double number1 = doubleTryParse.TryParse(Console.ReadLine());
+            Console.WriteLine("Введите второе число: ");
+            double number2 = doubleTryParse.TryParse(Console.ReadLine());
+            Console.WriteLine("Select an action \n1. + \n2. - \n3. / \n4. *");
+            int mathSymbol = Convert.ToInt32(Console.ReadLine());
 
-            if (input == "выход")
-                break;
-
-            string[] parts = input.Split(' ');
-
-            if (parts.Length != 3)
+            switch (mathSymbol)
             {
-                Console.WriteLine("Неверный ввод, введите что-то вроде '2.5 + 3'");
-                continue;
-            }
-
-            double a, b;
-            try
-            {
-                if (!DoubleTryParse(parts[0], out a))
-                {
-                    Console.WriteLine("Неверное число: " + parts[0]);
-                    continue;
-                }
-
-                if (!DoubleTryParse(parts[2], out b))
-                {
-                    Console.WriteLine("Неверное число: " + parts[2]);
-                    continue;
-                }
-            } catch (ArgumentException e){
-               Console.WriteLine(e.Message);
-                continue;
-            }
-            /*
-              if (a < 0 || b < 0)
-            {
-                Console.WriteLine("Числа не могут быть отрицательными");
-                continue;
-            }
-            */
-
-            double result;
-
-            switch (parts[1])
-            {
-                case "+":
-                    result = a + b;
-                    break;
-
-                case "-":
-                    result = a - b;
-                    if (result < 0)
+                case 1: calc.Sum(number1, number2); break;
+                case 2: calc.Sub(number1, number2); break;
+                case 3:
+                    try
                     {
-                        Console.WriteLine("Разность не может быть отрицательной");
-                        continue;
+                        calc.Divide(number1, number2); break;
+                    }
+                    catch (CalcDivideByZeroException e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
+                    catch (CalcException e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
                     }
                     break;
-
-                case "*":
-                    result = a * b;
-                    break;
-
-                case "/":
-                    if (b == 0)
-                    {
-                        Console.WriteLine("На ноль делить нельзя");
-                        continue;
-                    }
-
-                    result = a / b;
-                    break;
-
-                default:
-                    Console.WriteLine("Неверный оператор: " + parts[1]);
-                    continue;
+                case 4: calc.Multy(number1, number2); break;
             }
-
-            Console.WriteLine(result);
-        }
-
-        Console.WriteLine("До свидания!");
-    }
-
-    static bool DoubleTryParse (string s, out double result)
-    {
-        if( double.TryParse(s, out result)){
-            if (result < 0)
+            Console.WriteLine("Нажмите 'ESC' чтобы выйти из программы");
+            if (Console.ReadKey().Key == ConsoleKey.Escape)
             {
-                throw new ArgumentException("Число не может быть отрицательным");
+                isExit = false;
             }
-            return true;
+            Console.Clear();
+
         }
-        return false;
+
     }
 }
